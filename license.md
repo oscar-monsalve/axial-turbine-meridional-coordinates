@@ -5,7 +5,7 @@ tags: []
 ---
 
 Curved and constant/variable thickness blade meridional coordinates generator Copyright (C) 2024 University Institution ITM, developed by
-Oscar D. Monsalve-Cifuentes [Google Scholar](https://scholar.google.com/citations?user=xZFlJKYAAAAJ&hl=en)
+Oscar D. Monsalve-Cifuentes ([Google Scholar](https://scholar.google.com/citations?user=xZFlJKYAAAAJ&hl=en))
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
