@@ -152,7 +152,7 @@ User inputs:
     z: number of blades
 """
 
-# Hydraulic parameters
+# Hydraulic parameters: the followin parameters are required:
 H = 3  # m
 Q = 0.015  # m^3\s
 N = 3600  # rpm
@@ -167,7 +167,6 @@ rh = ri_hub
 rt = ri_tip
 ri_mid = (ri_hub + ri_tip) / 2
 
-# ----------------------------------------------------------------------------------------------
 
 # Generate the 3D circular profile with user inputs
 
@@ -203,7 +202,6 @@ interpolated_values_hub, r_squared_hub = interpolate_polynomial(m_hub, theta_hub
 interpolated_values_mid, r_squared_mid = interpolate_polynomial(m_mid, theta_mid, percentage_positions)
 interpolated_values_tip, r_squared_tip = interpolate_polynomial(m_tip, theta_tip, percentage_positions)
 
-# ----------------------------------------------------------------------------------------------
 
 # Print 2D coordinates
 # print("2D x-coordinate")
@@ -256,7 +254,6 @@ for i, pos in enumerate(percentage_positions):
     print(f"theta_tip = {interpolated_values_tip[i]:.4f} ")
     print("---------------------------------")
 
-# ----------------------------------------------------------------------------------------------
 
 # 2D plotting
 plt.figure(figsize=(16, 4))
@@ -299,7 +296,6 @@ plt.show()
 # np.savetxt("y_3D_tip.txt", y_3d_tip * 1000, delimiter=",")
 # np.savetxt("z_3D_tip.txt", z_3d_tip * 1000, delimiter=",")
 
-# ----------------------------------------------------------------------------------------------
 
 # # Plotting %m_prime vs. theta
 plt.plot(m_hub, theta_hub, label="Hub")

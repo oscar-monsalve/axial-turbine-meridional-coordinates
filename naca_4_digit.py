@@ -233,7 +233,7 @@ User inputs:
     z: number of blades
 """
 
-# Hydraulic parameters
+# Hydraulic parameters: the followin parameters are required:
 H = 3  # m
 Q = 0.015  # m^3/s
 N = 3600  # rpm
