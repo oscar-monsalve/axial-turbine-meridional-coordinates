@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def generate_circular_profile(H, Q, N, eff, ri, rh, rt, z):
+def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: float, rh: float, rt: float, z: float) -> float:
     """
     Circular profile generator. It projects the 2D mean line into 3D coordinates
 
@@ -25,7 +25,7 @@ def generate_circular_profile(H, Q, N, eff, ri, rh, rt, z):
     # rho = 997 # Water density (kg/m^3)
     g = 9.81  # Gravitational acceleration (m/s^2)
     k = (g*H*eff*60) / (N*2*np.pi)  # Free vortex constant (m^2/s)
-    wrap_angle = np.deg2rad(360 / z)  # Wrap angle (To insert in Bladegen for the first window in angle/thickness mode)
+    wrap_angle = np.deg2rad(360 / z)  # Wrap angle (Input parameter for Bladegen at the first window in angle/thickness mode)
     omega = N * (2*np.pi/60)  # Angular velocity in rad/s
 
     # Velocities
@@ -84,7 +84,7 @@ def generate_circular_profile(H, Q, N, eff, ri, rh, rt, z):
     return x_3d, y_3d, z_3d, x_2d, y_2d, np.rad2deg(beta1), np.rad2deg(beta2), L, x1, x2, rc, xc, yc, ca
 
 
-def cartesian_to_meridional(x, y, z):
+def cartesian_to_meridional(x: float, y: float, z: float) -> float:
     """Transforms 3D cartesian coordinates (x, y, z) to meridional coordinates (%m_prime, theta)"""
 
     m = []
@@ -120,7 +120,7 @@ def cartesian_to_meridional(x, y, z):
     return m_i_percentage, theta
 
 
-def interpolate_polynomial(m_prime_percentage, theta, points_to_evaluate):
+def interpolate_polynomial(m_prime_percentage: float, theta: float, points_to_evaluate: float) -> float:
     """Interpolates the meridional coordinates (%m_prime, theta) and evaluates at %m_prime(0, 25, 50, 75, 100) %"""
 
     # 5th grade polynomial fit
@@ -145,11 +145,11 @@ def interpolate_polynomial(m_prime_percentage, theta, points_to_evaluate):
 User inputs:
     H: head (m)
     Q: flow rate (m^3/s)
-    N: angualar velocity (rpm)
+    N: angular velocity (rpm)
     eff: turbine efficiency (-)
     r_hub: hub radius (m)
     r_tip: tip radius (m)
-    z: number of blades
+    z: number of blades (-)
 """
 
 # Hydraulic parameters: the followin parameters are required:
@@ -160,7 +160,6 @@ eff = 0.65
 ri_hub = 0.02259  # m
 ri_tip = 0.03765  # m
 z = 5
-# ri_mid = 0.0318
 
 # Do not change the following definitions
 rh = ri_hub

@@ -2,9 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def calculate_velocity_triangle_and_chord_length(H, Q, N, eff, ri, rh, rt, z):
+def calculate_velocity_triangle_and_chord_length(H: float, Q: float, N: float, eff: float, ri: float, rh: float, rt: float, z: float) -> float:
     """
-    Resolves the velocity triangle assuming free vortex at leading edge. Calculates the airfoil chord length and the blade stagger angle
+    Resolves the velocity triangle assuming free vortex at leading edge. Calculates the airfoil chord length and
+    the blade stagger angle.
 
     Function arguments:
     H: head (m)
@@ -61,7 +62,7 @@ def calculate_velocity_triangle_and_chord_length(H, Q, N, eff, ri, rh, rt, z):
     return va, vt, vc, np.rad2deg(beta1), np.rad2deg(beta2), np.rad2deg(beta_mean), np.rad2deg(stagger_angle), chord_length, solidity, ca
 
 
-def generate_naca_4_digit(C, ri, stagger_angle):
+def generate_naca_4_digit(C: float, ri: float, stagger_angle: float) -> float:
     """
     NACA 4-digit airfoil generator. It projects the 2D profile into 3D coordinates
 
@@ -165,7 +166,7 @@ def generate_naca_4_digit(C, ri, stagger_angle):
     )
 
 
-def cartesian_to_meridional(x, y, z):
+def cartesian_to_meridional(x: float, y: float, z: float) -> float:
     """Transforms 3D cartesian coordinates (x, y, z) to meridional coordinates (m, theta)"""
 
     m = []  # Store the m_i values
@@ -201,7 +202,7 @@ def cartesian_to_meridional(x, y, z):
     return m_i_percentage, theta
 
 
-def interpolate_polynomial(m_prime_percentage, theta, points_to_evaluate):
+def interpolate_polynomial(m_prime_percentage: float, theta: float, points_to_evaluate: float) -> float:
     """Interpolates the meridional coordinates (%m_prime, theta) and evaluates at %m_prime(0, 25, 50, 75, 100) %"""
 
     # 5th grade polynomial fit
@@ -230,7 +231,7 @@ User inputs:
     eff: turbine efficiency (-)
     r_hub: hub radius (m)
     r_tip: tip radius (m)
-    z: number of blades
+    z: number of blades (-)
 """
 
 # Hydraulic parameters: the followin parameters are required:
