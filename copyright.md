@@ -15,3 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public 
 GNU General Public License, please see this URL:
 
 http://www.gnu.org/licenses/gpl-2.0.html
+
+Author:
+
+Oscar Monsalve (oscarmonsalvec5@gmail.com)
