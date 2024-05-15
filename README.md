@@ -1,4 +1,4 @@
-# Blagen coordinates generator
+# Meridional coordinates generator
 
 The codes available in this repository generate turbine blade meridional coordinates. These coordinates are $m, \\; \theta$, where $m$ is
 the meridional coordinate and $\theta$ is the blade wrap angle.
