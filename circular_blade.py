@@ -36,6 +36,7 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     # Leading and trailing edge angles
     beta1 = np.arctan(va / vt)
     beta2 = np.arctan(va / (vc + vt))
+    beta_avg = np.arctan(0.5*(np.tan(beta1) + np.tan(beta2)))
 
     # Circualar profile x,y coodinates calculation
     L = ri * wrap_angle
@@ -81,7 +82,7 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     x_3d = ri*np.cos(theta)
     y_3d = ri*np.sin(theta)
 
-    return x_3d, y_3d, z_3d, x_2d, y_2d, np.rad2deg(beta1), np.rad2deg(beta2), L, x1, x2, rc, xc, yc, ca
+    return x_3d, y_3d, z_3d, x_2d, y_2d, np.rad2deg(beta1), np.rad2deg(beta2), L, x1, x2, rc, xc, yc, ca, np.rad2deg(beta_avg)
 
 
 def cartesian_to_meridional(x: float, y: float, z: float) -> float:
@@ -173,21 +174,21 @@ ri_mid = (ri_hub + ri_tip) / 2
     x_3d_hub, y_3d_hub, z_3d_hub,
     x_hub_2d, y_hub_2d,
     beta1_hub, beta2_hub,
-    L_hub, x1_hub, x2_hub, rc_hub, xc_hub, yc_hub, ca_hub
+    L_hub, x1_hub, x2_hub, rc_hub, xc_hub, yc_hub, ca_hub, beta_avg_hub
 ) = generate_circular_profile(H, Q, N, eff, ri_hub, rh, rt, z)
 
 (
     x_3d_mid, y_3d_mid, z_3d_mid,
     x_mid_2d, y_mid_2d,
     beta1_mid, beta2_mid,
-    L_mid, x1_mid, x2_mid, rc_mid, xc_mid, yc_mid, ca_mid
+    L_mid, x1_mid, x2_mid, rc_mid, xc_mid, yc_mid, ca_mid, beta_avg_mid
 ) = generate_circular_profile(H, Q, N, eff, ri_mid, rh, rt, z)
 
 (
     x_3d_tip, y_3d_tip, z_3d_tip,
     x_tip_2d, y_tip_2d,
     beta1_tip, beta2_tip,
-    L_tip, x1_tip, x2_tip, rc_tip, xc_tip, yc_tip, ca_tip
+    L_tip, x1_tip, x2_tip, rc_tip, xc_tip, yc_tip, ca_tip, beta_avg_tip
 ) = generate_circular_profile(H, Q, N, eff, ri_tip, rh, rt, z)
 
 # Transform x,y,z to Bladegen meridional coordinates %m_prime, theta
@@ -253,6 +254,10 @@ for i, pos in enumerate(percentage_positions):
     print(f"theta_tip = {interpolated_values_tip[i]:.4f} ")
     print("---------------------------------")
 
+print("Stagger angles:")
+print(f"hub -> {beta_avg_hub:.2f}°")
+print(f"mid -> {beta_avg_mid:.2f}°")
+print(f"tip -> {beta_avg_tip:.2f}°")
 
 # 2D plotting
 plt.figure(figsize=(16, 4))
