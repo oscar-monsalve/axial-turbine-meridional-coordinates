@@ -53,7 +53,6 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     ca = ((rc * np.cos(beta2) - yc)) * 1000  # mm
 
     # 2D projection x,y
-
     number_of_points = 40
     # x coordinate generation
     x_2d = []
@@ -65,7 +64,7 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     y_2d = yc - np.sqrt(rc**2 - (x_2d - xc)**2)
 
     # Displace x to the right by L/2 to make the first values of x,y equal 0. This is mandatory to transform to bladegen coord
-    # x_2d = x_2d + L/2
+    x_2d = x_2d + L/2
 
     # Rotate the profile to a desired stagger angle
     stagger_angle_rad = np.deg2rad(stagger_angle)
