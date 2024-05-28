@@ -41,7 +41,9 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     beta_avg = np.arctan(0.5*(np.tan(beta1) + np.tan(beta2)))
 
     # Circular profile x,y coodinates calculation
-    L = ri * wrap_angle
+    L = 2 * ri * np.sin(wrap_angle / 2)
+    # L = ri * wrap_angle
+
     x1 = -L / 2
     x2 = L / 2
 
@@ -64,7 +66,7 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     y_2d = yc - np.sqrt(rc**2 - (x_2d - xc)**2)
 
     # Displace x to the right by L/2 to make the first values of x,y equal 0. This is mandatory to transform to bladegen coord
-    x_2d = x_2d + L/2
+    # x_2d = x_2d + L/2
 
     # Rotate the profile to a desired stagger angle
     stagger_angle_rad = np.deg2rad(stagger_angle)
@@ -283,7 +285,7 @@ print(f"hub -> {beta_avg_hub:.2f}°")
 print(f"mid -> {beta_avg_mid:.2f}°")
 print(f"tip -> {beta_avg_tip:.2f}°")
 
-# 2D plotting of unrotated profile
+# 2D plotting
 plt.figure(figsize=(16, 4))
 plt.plot(x_hub_2d, y_hub_2d, label="Hub")
 plt.plot(x_mid_2d, y_mid_2d, label="Mid")
