@@ -2,7 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: float, rh: float, rt: float, z: float) -> float:
+def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: float, rh: float, rt: float, z: float,
+                              stagger_angle: float) -> float:
     """
     Circular profile generator. It projects the 2D mean line into 3D coordinates
 
@@ -15,6 +16,7 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     rh: hub radius (m)
     rt: tip radius (m)
     z: number of blades
+    stagger_angle (°)
     """
 
     # Step 1. Project the circular profile to 2D cartesian coordinates x,y
@@ -65,34 +67,39 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     # Displace x to the right by L/2 to make the first values of x,y equal 0. This is mandatory to transform to bladegen coord
     # x_2d = x_2d + L/2
 
+    # Rotate the profile to a desired stagger angle
+    stagger_angle_rad = np.deg2rad(stagger_angle)
+    x_2d_rotated = np.array(x_2d) * np.cos(stagger_angle_rad) - np.array(y_2d) * np.sin(stagger_angle_rad)
+    y_2d_rotated = np.array(x_2d) * np.sin(stagger_angle_rad) + np.array(y_2d) * np.cos(stagger_angle_rad)
+
     # ----------------------------------------------------------------------------------------------
 
     # Step 2. Project the profile to 3D cylindrical coordinates (ri, theta, z)
 
     # Projecting the camber
 
-    theta = [i / ri for i in x_2d]
+    theta = [i / ri for i in x_2d_rotated]
     # theta = x_2d/ri
-    z_3d = y_2d
+    z_3d = y_2d_rotated
 
     # ----------------------------------------------------------------------------------------------
 
     # Step 3. Transform the cylindrical coordinates to x,y,z. The coordinate z is equal to z_cylindrical
 
-    x_3d = ri*np.cos(theta)
-    y_3d = ri*np.sin(theta)
+    x_3d = ri * np.cos(theta)
+    y_3d = ri * np.sin(theta)
 
-    return x_3d, y_3d, z_3d, x_2d, y_2d, np.rad2deg(beta1), np.rad2deg(beta2), L, x1, x2, rc, xc, yc, ca, np.rad2deg(beta_avg)
+    return x_3d, y_3d, z_3d, x_2d_rotated, y_2d_rotated, np.rad2deg(beta1), np.rad2deg(beta2), L, x1, x2, rc, xc, yc, ca, np.rad2deg(beta_avg)
 
 
-def rotate_profile(x_2d: float, y_2d: float, stagger_angle: float) -> float:
-    """Rotates the circular blade to a desired stagger angle."""
-
-    stagger_angle_rad = np.deg2rad(stagger_angle)
-    x_2d_rotated = np.array(x_2d) * np.cos(stagger_angle_rad) - np.array(y_2d) * np.sin(stagger_angle_rad)
-    y_2d_rotated = np.array(x_2d) * np.sin(stagger_angle_rad) + np.array(y_2d) * np.cos(stagger_angle_rad)
-
-    return x_2d_rotated, y_2d_rotated
+# def rotate_profile(x_2d: float, y_2d: float, stagger_angle: float) -> float:
+#    """Rotates the circular blade to a desired stagger angle."""
+#
+#    stagger_angle_rad = np.deg2rad(stagger_angle)
+#    x_2d_rotated = np.array(x_2d) * np.cos(stagger_angle_rad) - np.array(y_2d) * np.sin(stagger_angle_rad)
+#    y_2d_rotated = np.array(x_2d) * np.sin(stagger_angle_rad) + np.array(y_2d) * np.cos(stagger_angle_rad)
+#
+#    return x_2d_rotated, y_2d_rotated
 
 
 def cartesian_to_meridional(x: float, y: float, z: float) -> float:
@@ -171,6 +178,9 @@ eff = 0.65
 ri_hub = 0.02259  # m
 ri_tip = 0.03765  # m
 z = 5
+stagger_angle_hub = 28.96 - 69.30  # degress
+stagger_angle_mid = 23.44 - 63.77  # degress
+stagger_angle_tip = 19.53 - 59.87  # degress
 
 # Do not change the following definitions
 rh = ri_hub
@@ -185,30 +195,27 @@ ri_mid = (ri_hub + ri_tip) / 2
     x_hub_2d, y_hub_2d,
     beta1_hub, beta2_hub,
     L_hub, x1_hub, x2_hub, rc_hub, xc_hub, yc_hub, ca_hub, beta_avg_hub
-) = generate_circular_profile(H, Q, N, eff, ri_hub, rh, rt, z)
+) = generate_circular_profile(H, Q, N, eff, ri_hub, rh, rt, z, stagger_angle_hub)
 
 (
     x_3d_mid, y_3d_mid, z_3d_mid,
     x_mid_2d, y_mid_2d,
     beta1_mid, beta2_mid,
     L_mid, x1_mid, x2_mid, rc_mid, xc_mid, yc_mid, ca_mid, beta_avg_mid
-) = generate_circular_profile(H, Q, N, eff, ri_mid, rh, rt, z)
+) = generate_circular_profile(H, Q, N, eff, ri_mid, rh, rt, z, stagger_angle_mid)
 
 (
     x_3d_tip, y_3d_tip, z_3d_tip,
     x_tip_2d, y_tip_2d,
     beta1_tip, beta2_tip,
     L_tip, x1_tip, x2_tip, rc_tip, xc_tip, yc_tip, ca_tip, beta_avg_tip
-) = generate_circular_profile(H, Q, N, eff, ri_tip, rh, rt, z)
+) = generate_circular_profile(H, Q, N, eff, ri_tip, rh, rt, z, stagger_angle_tip)
 
 
 # Rotate the circular profile to a desired stagger angle
-stagger_angle_hub = 28.96 - 69.3  # degress
-stagger_angle_mid = 23.44 - 63.77  # degress
-stagger_angle_tip = 19.53 - 59.87  # degress
-x_2d_rotated_hub, y_2d_rotated_hub = rotate_profile(x_hub_2d, y_hub_2d, stagger_angle_hub)
-x_2d_rotated_mid, y_2d_rotated_mid = rotate_profile(x_mid_2d, y_mid_2d, stagger_angle_mid)
-x_2d_rotated_tip, y_2d_rotated_tip = rotate_profile(x_tip_2d, y_tip_2d, stagger_angle_tip)
+# x_2d_rotated_hub, y_2d_rotated_hub = rotate_profile(x_hub_2d, y_hub_2d, stagger_angle_hub)
+# x_2d_rotated_mid, y_2d_rotated_mid = rotate_profile(x_mid_2d, y_mid_2d, stagger_angle_mid)
+# x_2d_rotated_tip, y_2d_rotated_tip = rotate_profile(x_tip_2d, y_tip_2d, stagger_angle_tip)
 
 
 # Transform x,y,z to Bladegen meridional coordinates %m_prime, theta
@@ -292,18 +299,18 @@ plt.legend()
 plt.show()
 
 # 2D plotting rotated profile
-plt.figure(figsize=(16, 4))
-plt.plot(x_2d_rotated_hub, y_2d_rotated_hub, label="Hub")
-plt.plot(x_2d_rotated_mid, y_2d_rotated_mid, label="Mid")
-plt.plot(x_2d_rotated_tip, y_2d_rotated_tip, label="Tip")
-plt.title("2D cartesian projection of the rotated circular profile")
-plt.xlabel("x")
-plt.ylabel("y")
-# plt.xlim(0,)
-plt.grid(True)
-# plt.axis("scaled")
-plt.legend()
-plt.show()
+# plt.figure(figsize=(16, 4))
+# plt.plot(x_2d_rotated_hub, y_2d_rotated_hub, label="Hub")
+# plt.plot(x_2d_rotated_mid, y_2d_rotated_mid, label="Mid")
+# plt.plot(x_2d_rotated_tip, y_2d_rotated_tip, label="Tip")
+# plt.title("2D cartesian projection of the rotated circular profile")
+# plt.xlabel("x")
+# plt.ylabel("y")
+# # plt.xlim(0,)
+# plt.grid(True)
+# # plt.axis("scaled")
+# plt.legend()
+# plt.show()
 
 # 3D plotting
 fig = plt.figure()
