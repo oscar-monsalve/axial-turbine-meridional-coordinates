@@ -85,16 +85,6 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     return x_3d, y_3d, z_3d, x_2d, y_2d, np.rad2deg(beta1), np.rad2deg(beta2), L, x1, x2, rc, xc, yc, ca, np.rad2deg(beta_avg)
 
 
-def rotate_profile(x_2d: float, y_2d: float, stagger_angle: float) -> float:
-    """Rotates the circular blade to a desired stagger angle."""
-
-    stagger_angle_rad = np.deg2rad(stagger_angle)
-    x_2d_rotated = np.array(x_2d) * np.cos(stagger_angle_rad) - np.array(y_2d) * np.sin(stagger_angle_rad)
-    y_2d_rotated = np.array(x_2d) * np.sin(stagger_angle_rad) + np.array(y_2d) * np.cos(stagger_angle_rad)
-
-    return x_2d_rotated, y_2d_rotated
-
-
 def cartesian_to_meridional(x: float, y: float, z: float) -> float:
     """Transforms 3D cartesian coordinates (x, y, z) to meridional coordinates (%m_prime, theta)"""
 
@@ -202,15 +192,6 @@ ri_mid = (ri_hub + ri_tip) / 2
 ) = generate_circular_profile(H, Q, N, eff, ri_tip, rh, rt, z)
 
 
-# Rotate the circular profile to a desired stagger angle
-stagger_angle_hub = 28.96 - 69.3  # degress
-stagger_angle_mid = 23.44 - 63.77  # degress
-stagger_angle_tip = 19.53 - 59.87  # degress
-x_2d_rotated_hub, y_2d_rotated_hub = rotate_profile(x_hub_2d, y_hub_2d, stagger_angle_hub)
-x_2d_rotated_mid, y_2d_rotated_mid = rotate_profile(x_mid_2d, y_mid_2d, stagger_angle_mid)
-x_2d_rotated_tip, y_2d_rotated_tip = rotate_profile(x_tip_2d, y_tip_2d, stagger_angle_tip)
-
-
 # Transform x,y,z to Bladegen meridional coordinates %m_prime, theta
 m_hub, theta_hub = cartesian_to_meridional(x_3d_hub, y_3d_hub, z_3d_hub)
 m_mid, theta_mid = cartesian_to_meridional(x_3d_mid, y_3d_mid, z_3d_mid)
@@ -291,20 +272,6 @@ plt.grid(True)
 plt.legend()
 plt.show()
 
-# 2D plotting rotated profile
-plt.figure(figsize=(16, 4))
-plt.plot(x_2d_rotated_hub, y_2d_rotated_hub, label="Hub")
-plt.plot(x_2d_rotated_mid, y_2d_rotated_mid, label="Mid")
-plt.plot(x_2d_rotated_tip, y_2d_rotated_tip, label="Tip")
-plt.title("2D cartesian projection of the rotated circular profile")
-plt.xlabel("x")
-plt.ylabel("y")
-# plt.xlim(0,)
-plt.grid(True)
-# plt.axis("scaled")
-plt.legend()
-plt.show()
-
 # 3D plotting
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d', proj_type="ortho")
@@ -319,20 +286,6 @@ ax.set_aspect("equal")
 ax.legend()
 plt.show()
 
-# Export profile 3D data in mm for the thesis methodology
-# np.savetxt("x_3D_hub.txt", x_3d_hub * 1000, delimiter=",")
-# np.savetxt("y_3D_hub.txt", y_3d_hub * 1000, delimiter=",")
-# np.savetxt("z_3D_hub.txt", z_3d_hub * 1000, delimiter=",")
-
-# np.savetxt("x_3D_mid.txt", x_3d_mid * 1000, delimiter=",")
-# np.savetxt("y_3D_mid.txt", y_3d_mid * 1000, delimiter=",")
-# np.savetxt("z_3D_mid.txt", z_3d_mid * 1000, delimiter=",")
-
-# np.savetxt("x_3D_tip.txt", x_3d_tip * 1000, delimiter=",")
-# np.savetxt("y_3D_tip.txt", y_3d_tip * 1000, delimiter=",")
-# np.savetxt("z_3D_tip.txt", z_3d_tip * 1000, delimiter=",")
-
-
 # # Plotting %m_prime vs. theta
 plt.plot(m_hub, theta_hub, label="Hub")
 plt.plot(m_mid, theta_mid, label="Mid")
@@ -345,6 +298,19 @@ plt.ylabel(r"$\theta$")
 plt.grid(True)
 plt.legend()
 plt.show()
+
+# Export profile 3D data in mm for the thesis methodology
+# np.savetxt("x_3D_hub.txt", x_3d_hub * 1000, delimiter=",")
+# np.savetxt("y_3D_hub.txt", y_3d_hub * 1000, delimiter=",")
+# np.savetxt("z_3D_hub.txt", z_3d_hub * 1000, delimiter=",")
+
+# np.savetxt("x_3D_mid.txt", x_3d_mid * 1000, delimiter=",")
+# np.savetxt("y_3D_mid.txt", y_3d_mid * 1000, delimiter=",")
+# np.savetxt("z_3D_mid.txt", z_3d_mid * 1000, delimiter=",")
+
+# np.savetxt("x_3D_tip.txt", x_3d_tip * 1000, delimiter=",")
+# np.savetxt("y_3D_tip.txt", y_3d_tip * 1000, delimiter=",")
+# np.savetxt("z_3D_tip.txt", z_3d_tip * 1000, delimiter=",")
 
 # # Export meridional coordinates data for the thesis methodology
 # np.savetxt("m_hub.txt", m_hub, delimiter=",")
