@@ -41,8 +41,8 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     beta_avg = np.arctan(0.5 * (np.tan(beta1) + np.tan(beta2)))
 
     # Circular profile x,y coodinates calculation
-    # L = 2 * ri * np.sin(wrap_angle / 2)
-    L = ri * wrap_angle
+    L = 2 * ri * np.sin(wrap_angle / 2)
+    # L = ri * wrap_angle
 
     x1 = -L / 2
     x2 = L / 2
@@ -147,6 +147,20 @@ def interpolate_polynomial(m_prime_percentage: float, theta: float, points_to_ev
 
     return interpolated_values_points, r_squared
 
+
+def stagger_angle_rotated_arctan2(x1: float, x2: float, y1: float, y2: float) -> float:
+    """Returns the stagger angle of the rotated circular profile"""
+    angle = np.rad2deg(np.arctan2(y2 - y1, x2 - x1))
+    return angle
+
+
+def stagger_angle_rotated_arctan(x1: float, x2: float, y1: float, y2: float) -> float:
+    """Returns the stagger angle of the rotated circular profile"""
+    slope = y2 - y1 / (x2 - x1)
+    angle = np.rad2deg(np.arctan(slope))
+    return angle
+
+
 # ----------------------------------------------------------------------------------------------
 
 
@@ -208,12 +222,21 @@ m_hub, theta_hub = cartesian_to_meridional(x_3d_hub, y_3d_hub, z_3d_hub)
 m_mid, theta_mid = cartesian_to_meridional(x_3d_mid, y_3d_mid, z_3d_mid)
 m_tip, theta_tip = cartesian_to_meridional(x_3d_tip, y_3d_tip, z_3d_tip)
 
-
-# # Interpolate the meridional coordinates (%m_prime, theta) with 5th grade polynomial at specified points
+# Interpolate the meridional coordinates (%m_prime, theta) with 5th grade polynomial at specified points
 percentage_positions = [0.0, 0.25, 0.5, 0.75, 1.0]  # Points to evaluate the fitted fucntion theta(%m_prime)
 interpolated_values_hub, r_squared_hub = interpolate_polynomial(m_hub, theta_hub, percentage_positions)
 interpolated_values_mid, r_squared_mid = interpolate_polynomial(m_mid, theta_mid, percentage_positions)
 interpolated_values_tip, r_squared_tip = interpolate_polynomial(m_tip, theta_tip, percentage_positions)
+
+# Calculate the stagger angle with arctan2 of the rotated circular profile
+rotated_stagger_angle_hub_arctan2 = stagger_angle_rotated_arctan2(x_hub_2d[0], x_hub_2d[-1], y_hub_2d[0], y_hub_2d[-1])
+rotated_stagger_angle_mid_arctan2 = stagger_angle_rotated_arctan2(x_mid_2d[0], x_mid_2d[-1], y_mid_2d[0], y_mid_2d[-1])
+rotated_stagger_angle_tip_arctan2 = stagger_angle_rotated_arctan2(x_tip_2d[0], x_tip_2d[-1], y_tip_2d[0], y_tip_2d[-1])
+
+# Calculate the stagger angle with arctan of the rotated circular profile
+rotated_stagger_angle_hub_arctan = stagger_angle_rotated_arctan(x_hub_2d[0], x_hub_2d[-1], y_hub_2d[0], y_hub_2d[-1])
+rotated_stagger_angle_mid_arctan = stagger_angle_rotated_arctan(x_mid_2d[0], x_mid_2d[-1], y_mid_2d[0], y_mid_2d[-1])
+rotated_stagger_angle_tip_arctan = stagger_angle_rotated_arctan(x_tip_2d[0], x_tip_2d[-1], y_tip_2d[0], y_tip_2d[-1])
 
 
 # Print 2D coordinates
@@ -264,10 +287,21 @@ for i, pos in enumerate(percentage_positions):
     print(f"theta_tip = {interpolated_values_tip[i]:.4f} ")
     print("---------------------------------")
 
-print("Stagger angles:")
-print(f"hub -> {beta_avg_hub:.2f}°")
-print(f"mid -> {beta_avg_mid:.2f}°")
-print(f"tip -> {beta_avg_tip:.2f}°")
+print("Original stagger angles:")
+print(f"    hub -> {beta_avg_hub:.2f}°")
+print(f"    mid -> {beta_avg_mid:.2f}°")
+print(f"    tip -> {beta_avg_tip:.2f}°")
+
+print("Rotated stagger angles (arctan2):")
+print(f"    hub -> {rotated_stagger_angle_hub_arctan2:.2f}°")
+print(f"    mid -> {rotated_stagger_angle_mid_arctan2:.2f}°")
+print(f"    tip -> {rotated_stagger_angle_tip_arctan2:.2f}°")
+
+print("Rotated stagger angles (arctan):")
+print(f"    hub -> {rotated_stagger_angle_hub_arctan:.2f}°")
+print(f"    mid -> {rotated_stagger_angle_mid_arctan:.2f}°")
+print(f"    tip -> {rotated_stagger_angle_tip_arctan:.2f}°")
+
 
 # 2D plotting
 plt.figure(figsize=(16, 4))
