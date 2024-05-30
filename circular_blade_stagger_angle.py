@@ -26,7 +26,7 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     # Constants
     # rho = 997 # Water density (kg/m^3)
     g = 9.81  # Gravitational acceleration (m/s^2)
-    k = (g*H*eff*60) / (N*2*np.pi)  # Free vortex constant (m^2/s)
+    k = (g * H * eff * 60) / (N * 2 * np.pi)  # Free vortex constant (m^2/s)
     wrap_angle = np.deg2rad(360 / z)  # Wrap angle (Input parameter for Bladegen at the first window in angle/thickness mode)
     omega = N * (2*np.pi/60)  # Angular velocity in rad/s
 
@@ -266,11 +266,11 @@ print(f"""beta1_tip : {beta1_tip:.6f} °, beta2_tip : {beta2_tip:.6f} °, L_tip 
 print("---------------------------------")
 
 # Print R^2 for the interpolated values of theta(%m_prime)
-print("Coefficient of determination R^2 for the interpolated values of %m vs theta")
-print(f"R^2 at hub = {r_squared_hub}")
-print(f"R^2 at mid = {r_squared_mid}")
-print(f"R^2 at tip = {r_squared_tip}\n")
-print("---------------------------------")
+# print("Coefficient of determination R^2 for the interpolated values of %m vs theta")
+# print(f"R^2 at hub = {r_squared_hub}")
+# print(f"R^2 at mid = {r_squared_mid}")
+# print(f"R^2 at tip = {r_squared_tip}\n")
+# print("---------------------------------")
 
 # Print the blade axial chord Ca/2 for bladegen in mm
 print("Axial chord Ca/2 for the Bladegen meridional view:")

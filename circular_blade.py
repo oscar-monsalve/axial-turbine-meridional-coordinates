@@ -62,17 +62,14 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     # y coordinate generation
     y_2d = yc - np.sqrt(rc**2 - (x_2d - xc)**2)
 
-    # Displace x to the right by L/2 to make the first values of x,y equal 0. This is mandatory to transform to bladegen coord
+    # Displace x to the right by L/2 to make the first values of x,y equal 0.
     # x_2d = x_2d + L/2
 
     # ----------------------------------------------------------------------------------------------
 
     # Step 2. Project the profile to 3D cylindrical coordinates (ri, theta, z)
 
-    # Projecting the camber
-
     theta = [i / ri for i in x_2d]
-    # theta = x_2d/ri
     z_3d = y_2d
 
     # ----------------------------------------------------------------------------------------------
@@ -106,13 +103,13 @@ def cartesian_to_meridional(x: float, y: float, z: float) -> float:
             m_i = m_prev + np.sqrt((z[i]-z[i-1])**2 + (r_i-r_prev)**2) / r_i
 
         # Calculate theta_i for the current node
-        theta_i = np.rad2deg((np.arctan2(x[i], y[i]) - np.arctan2(x[0], y[0])))  # Theta_i in degrees [°]
+        theta_i = np.rad2deg((np.arctan2(y[i], x[i]) - np.arctan2(y[0], x[0])))  # Theta_i in degrees [°]
 
         m_prev = m_i
         r_prev = r_i
 
         m.append(m_i)
-        theta.append(theta_i*-1)  # theta_i was multiplied by -1 to obtain positive values for theta
+        theta.append(theta_i)  # theta_i was multiplied by -1 to obtain positive values for theta
 
     # Calculate %m_i
     max_m = max(m)
