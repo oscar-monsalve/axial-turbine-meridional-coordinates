@@ -150,8 +150,8 @@ def interpolate_polynomial(m_prime_percentage: float, theta: float, points_to_ev
 
 def stagger_angle_rotated_arctan2(x1: float, x2: float, y1: float, y2: float) -> float:
     """Returns the stagger angle of the rotated circular profile"""
-    angle = np.rad2deg(np.arctan2(y2 - y1, x2 - x1))
-    return angle
+    angle = np.arctan2(y2 - y1, x2 - x1) * -1  # multiplied by -1 to obtain positive values.
+    return np.rad2deg(angle)
 
 
 def stagger_angle_rotated_arctan(x1: float, x2: float, y1: float, y2: float) -> float:
@@ -159,6 +159,14 @@ def stagger_angle_rotated_arctan(x1: float, x2: float, y1: float, y2: float) -> 
     slope = y2 - y1 / (x2 - x1)
     angle = np.rad2deg(np.arctan(slope))
     return angle
+
+
+def beta_angles_rotated_profile(yc: float, rc: float, beta_mean: float) -> float:
+    """Returns the rotated profile's blade angles beta1 and beta2"""
+    beta_mean_rad = np.deg2rad(beta_mean)
+    beta1 = np.arccos(yc / rc)
+    beta2 = np.arctan(2 * np.tan(beta_mean_rad) - np.tan(beta1))
+    return np.rad2deg(beta1), np.rad2deg(beta2)
 
 
 # ----------------------------------------------------------------------------------------------
@@ -238,6 +246,9 @@ rotated_stagger_angle_hub_arctan = stagger_angle_rotated_arctan(x_hub_2d[0], x_h
 rotated_stagger_angle_mid_arctan = stagger_angle_rotated_arctan(x_mid_2d[0], x_mid_2d[-1], y_mid_2d[0], y_mid_2d[-1])
 rotated_stagger_angle_tip_arctan = stagger_angle_rotated_arctan(x_tip_2d[0], x_tip_2d[-1], y_tip_2d[0], y_tip_2d[-1])
 
+# Beta angles of the rotated profile
+beta1_rotated_hub, beta2_rotated_hub = beta_angles_rotated_profile(yc_hub, rc_hub, rotated_stagger_angle_hub_arctan2)
+
 
 # Print 2D coordinates
 # print("2D x-coordinate")
@@ -297,10 +308,15 @@ print(f"    hub -> {rotated_stagger_angle_hub_arctan2:.2f}°")
 print(f"    mid -> {rotated_stagger_angle_mid_arctan2:.2f}°")
 print(f"    tip -> {rotated_stagger_angle_tip_arctan2:.2f}°")
 
-print("Rotated stagger angles (arctan):")
-print(f"    hub -> {rotated_stagger_angle_hub_arctan:.2f}°")
-print(f"    mid -> {rotated_stagger_angle_mid_arctan:.2f}°")
-print(f"    tip -> {rotated_stagger_angle_tip_arctan:.2f}°")
+# print("Rotated stagger angles (arctan):")
+# print(f"    hub -> {rotated_stagger_angle_hub_arctan:.2f}°")
+# print(f"    mid -> {rotated_stagger_angle_mid_arctan:.2f}°")
+# print(f"    tip -> {rotated_stagger_angle_tip_arctan:.2f}°")
+
+print("Rotated blade angles:")
+print(f"    hub -> beta1: {beta1_rotated_hub:.2f}°, beta2: {beta2_rotated_hub:.2f}°")
+# print(f"    mid -> {rotated_stagger_angle_mid_arctan2:.2f}°")
+# print(f"    tip -> {rotated_stagger_angle_tip_arctan2:.2f}°")
 
 
 # 2D plotting
