@@ -41,9 +41,8 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     beta_avg = np.arctan(0.5 * (np.tan(beta1) + np.tan(beta2)))
 
     # Circular profile x,y coodinates calculation
-    L = 2 * ri * np.sin(wrap_angle / 2)
-    # L = ri * wrap_angle
-
+    # L = 2 * ri * np.sin(wrap_angle / 2)
+    L = ri * wrap_angle
     x1 = -L / 2
     x2 = L / 2
 
@@ -52,7 +51,7 @@ def generate_circular_profile(H: float, Q: float, N: float, eff: float, ri: floa
     yc = rc * np.sin(np.pi/2 - beta1)  # Circle center at y coordinate
 
     # Calculate the half axial chord for bladegen to use on the meridional view. In bladegen, the axial chord is Ca/2.
-    ca = ((rc * np.cos(beta2) - yc)) * 1000  # mm
+    ca = ((rc * np.cos(beta2) - yc))
 
     # 2D projection x,y
     number_of_points = 40
@@ -148,28 +147,25 @@ def interpolate_polynomial(m_prime_percentage: float, theta: float, points_to_ev
     return interpolated_values_points, r_squared
 
 
+def cord_length(x1: float, x2: float, y1: float, y2: float) -> float:
+    """Returns the profile's cord length from the 2D coordinates of the leading and trailing edge"""
+    return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+
+def axial_cord_rotated_blade(cord_length: float, stagger_angle: float) -> float:
+    """Returns the axial cord length of the rotated blade."""
+    stagger_angle_rad = np.deg2rad(stagger_angle)
+    return cord_length * np.sin(stagger_angle_rad)
+
+
 def stagger_angle_rotated_arctan2(x1: float, x2: float, y1: float, y2: float) -> float:
     """Returns the stagger angle of the rotated circular profile"""
     angle = np.arctan2(y2 - y1, x2 - x1) * -1  # multiplied by -1 to obtain positive values.
     return np.rad2deg(angle)
 
-
-def stagger_angle_rotated_arctan(x1: float, x2: float, y1: float, y2: float) -> float:
-    """Returns the stagger angle of the rotated circular profile"""
-    slope = y2 - y1 / (x2 - x1)
-    angle = np.rad2deg(np.arctan(slope))
-    return angle
-
-
-def beta_angles_rotated_profile(yc: float, rc: float, beta_mean: float) -> float:
-    """Returns the rotated profile's blade angles beta1 and beta2"""
-    beta_mean_rad = np.deg2rad(beta_mean)
-    beta1 = np.arccos(yc / rc)
-    beta2 = np.arctan(2 * np.tan(beta_mean_rad) - np.tan(beta1))
-    return np.rad2deg(beta1), np.rad2deg(beta2)
-
-
 # ----------------------------------------------------------------------------------------------
+
+# Program entry point
 
 
 """
@@ -236,20 +232,27 @@ interpolated_values_hub, r_squared_hub = interpolate_polynomial(m_hub, theta_hub
 interpolated_values_mid, r_squared_mid = interpolate_polynomial(m_mid, theta_mid, percentage_positions)
 interpolated_values_tip, r_squared_tip = interpolate_polynomial(m_tip, theta_tip, percentage_positions)
 
+# ---------------------------------------------------
+
+# Blade geometry calculations
+# Calculate the profile's cord legnth
+cord_length_hub_rotated = cord_length(x_hub_2d[0], x_hub_2d[-1], y_hub_2d[0], y_hub_2d[-1])
+cord_length_mid_rotated = cord_length(x_mid_2d[0], x_mid_2d[-1], y_mid_2d[0], y_mid_2d[-1])
+cord_length_tip_rotated = cord_length(x_tip_2d[0], x_tip_2d[-1], y_tip_2d[0], y_tip_2d[-1])
+
 # Calculate the stagger angle with arctan2 of the rotated circular profile
 rotated_stagger_angle_hub_arctan2 = stagger_angle_rotated_arctan2(x_hub_2d[0], x_hub_2d[-1], y_hub_2d[0], y_hub_2d[-1])
 rotated_stagger_angle_mid_arctan2 = stagger_angle_rotated_arctan2(x_mid_2d[0], x_mid_2d[-1], y_mid_2d[0], y_mid_2d[-1])
 rotated_stagger_angle_tip_arctan2 = stagger_angle_rotated_arctan2(x_tip_2d[0], x_tip_2d[-1], y_tip_2d[0], y_tip_2d[-1])
 
-# Calculate the stagger angle with arctan of the rotated circular profile
-rotated_stagger_angle_hub_arctan = stagger_angle_rotated_arctan(x_hub_2d[0], x_hub_2d[-1], y_hub_2d[0], y_hub_2d[-1])
-rotated_stagger_angle_mid_arctan = stagger_angle_rotated_arctan(x_mid_2d[0], x_mid_2d[-1], y_mid_2d[0], y_mid_2d[-1])
-rotated_stagger_angle_tip_arctan = stagger_angle_rotated_arctan(x_tip_2d[0], x_tip_2d[-1], y_tip_2d[0], y_tip_2d[-1])
+# Calculate the rotated blade's axial cord
+ca_hub_rotated = axial_cord_rotated_blade(cord_length_hub_rotated, rotated_stagger_angle_hub_arctan2)
+ca_mid_rotated = axial_cord_rotated_blade(cord_length_mid_rotated, rotated_stagger_angle_mid_arctan2)
+ca_tip_rotated = axial_cord_rotated_blade(cord_length_tip_rotated, rotated_stagger_angle_tip_arctan2)
 
-# Beta angles of the rotated profile
-beta1_rotated_hub, beta2_rotated_hub = beta_angles_rotated_profile(yc_hub, rc_hub, rotated_stagger_angle_hub_arctan2)
+# ---------------------------------------------------
 
-
+# Print data
 # Print 2D coordinates
 # print("2D x-coordinate")
 # for i in x_tip_2d:
@@ -271,9 +274,9 @@ beta1_rotated_hub, beta2_rotated_hub = beta_angles_rotated_profile(yc_hub, rc_hu
 #     print(i)
 
 # Print circular profile geometry results
-print(f"""beta1_hub : {beta1_hub:.6f} °, beta2_hub : {beta2_hub:.6f} °, L_hub : {L_hub:.6f}, x1_hub : {x1_hub:.6f}, x2_hub : {x2_hub:.6f}, rc_hub : {rc_hub:.6f}, xc_hub : {xc_hub:.6f}, yc_hub : {yc_hub:.6f}""")
-print(f"""beta1_mid : {beta1_mid:.6f} °, beta2_mid : {beta2_mid:.6f} °, L_mid : {L_mid:.6f}, x1_mid : {x1_mid:.6f}, x2_mid : {x2_mid:.6f}, rc_mid : {rc_mid:.6f}, xc_mid : {xc_mid:.6f}, yc_mid : {yc_mid:.6f}""")
-print(f"""beta1_tip : {beta1_tip:.6f} °, beta2_tip : {beta2_tip:.6f} °, L_tip : {L_tip:.6f}, x1_tip : {x1_tip:.6f}, x2_tip : {x2_tip:.6f}, rc_tip : {rc_tip:.6f}, xc_tip : {xc_tip:.6f}, yc_tip : {yc_tip:.6f}\n""")
+print(f"beta1_hub: {beta1_hub:.2f} °, beta2_hub: {beta2_hub:.2f} °, L_hub: {L_hub*1000:.2f} mm, x1_hub: {x1_hub*1000:.2f} mm, x2_hub: {x2_hub*1000:.2f} mm, rc_hub: {rc_hub*1000:.2f} mm, xc_hub: {xc_hub*1000:.2f} mm, yc_hub: {yc_hub*1000:.2f} mm")
+print(f"beta1_mid: {beta1_mid:.2f} °, beta2_mid: {beta2_mid:.2f} °, L_mid: {L_mid*1000:.2f} mm, x1_mid: {x1_mid*1000:.2f} mm, x2_mid: {x2_mid*1000:.2f} mm, rc_mid: {rc_mid*1000:.2f} mm, xc_mid: {xc_mid*1000:.2f} mm, yc_mid: {yc_mid*1000:.2f} mm")
+print(f"beta1_tip: {beta1_tip:.2f} °, beta2_tip: {beta2_tip:.2f} °, L_tip: {L_tip*1000:.2f} mm, x1_tip: {x1_tip*1000:.2f} mm, x2_tip: {x2_tip*1000:.2f} mm, rc_tip: {rc_tip*1000:.2f} mm, xc_tip: {xc_tip*1000:.2f} mm, yc_tip: {yc_tip*1000:.2f} mm")
 print("---------------------------------")
 
 # Print R^2 for the interpolated values of theta(%m_prime)
@@ -283,41 +286,41 @@ print("---------------------------------")
 # print(f"R^2 at tip = {r_squared_tip}\n")
 # print("---------------------------------")
 
-# Print the blade axial chord Ca/2 for bladegen in mm
-print("Axial chord Ca/2 for the Bladegen meridional view:")
-print(f"Ca/2_hub = {ca_hub/2:.4f}")
-print(f"Ca/2_mid = {ca_mid/2:.4f}")
-print(f"Ca/2_tip = {ca_tip/2:.4f}")
-print("---------------------------------")
-
 # Printing interpolated values of the function theta(%m_prime) and R^2
 for i, pos in enumerate(percentage_positions):
     print(f"Interpolated value at %m_prime = {int(pos*100)}%")
-    print(f"theta_hub = {interpolated_values_hub[i]:.4f} ")
-    print(f"theta_mid = {interpolated_values_mid[i]:.4f} ")
-    print(f"theta_tip = {interpolated_values_tip[i]:.4f} ")
-    print("---------------------------------")
+    print(f"    theta_hub = {interpolated_values_hub[i]:.4f} °")
+    print(f"    theta_mid = {interpolated_values_mid[i]:.4f} °")
+    print(f"    theta_tip = {interpolated_values_tip[i]:.4f} °")
 
-print("Original stagger angles:")
-print(f"    hub -> {beta_avg_hub:.2f}°")
-print(f"    mid -> {beta_avg_mid:.2f}°")
-print(f"    tip -> {beta_avg_tip:.2f}°")
+print("---------------------------------")
 
-print("Rotated stagger angles (arctan2):")
-print(f"    hub -> {rotated_stagger_angle_hub_arctan2:.2f}°")
-print(f"    mid -> {rotated_stagger_angle_mid_arctan2:.2f}°")
-print(f"    tip -> {rotated_stagger_angle_tip_arctan2:.2f}°")
+# Print the blade axial chord Ca/2 for bladegen in mm
+print("Original blade half axial chord (Ca/2) for Bladegen meridional view:")
+print(f"    hub: {(ca_hub/2)*1000:.4f} mm")
+print(f"    mid: {(ca_mid/2)*1000:.4f} mm")
+print(f"    tip: {(ca_tip/2)*1000:.4f} mm")
 
-# print("Rotated stagger angles (arctan):")
-# print(f"    hub -> {rotated_stagger_angle_hub_arctan:.2f}°")
-# print(f"    mid -> {rotated_stagger_angle_mid_arctan:.2f}°")
-# print(f"    tip -> {rotated_stagger_angle_tip_arctan:.2f}°")
+print("Rotated blade half axial chord (Ca/2) for Bladegen meridional view:")
+print(f"    hub: {(ca_hub_rotated/2)*1000:.4f} mm")
+print(f"    mid: {(ca_mid_rotated/2)*1000:.4f} mm")
+print(f"    tip: {(ca_tip_rotated/2)*1000:.4f} mm")
 
-print("Rotated blade angles:")
-print(f"    hub -> beta1: {beta1_rotated_hub:.2f}°, beta2: {beta2_rotated_hub:.2f}°")
-# print(f"    mid -> {rotated_stagger_angle_mid_arctan2:.2f}°")
-# print(f"    tip -> {rotated_stagger_angle_tip_arctan2:.2f}°")
+print("Rotated profile cord lengths (C):")
+print(f"    hub: {cord_length_hub_rotated*1000:.2f} mm")
+print(f"    mid: {cord_length_mid_rotated*1000:.2f} mm")
+print(f"    tip: {cord_length_tip_rotated*1000:.2f} mm")
+print("---------------------------------")
 
+print("Original blade stagger angles:")
+print(f"    hub: {beta_avg_hub:.2f} °")
+print(f"    mid: {beta_avg_mid:.2f} °")
+print(f"    tip: {beta_avg_tip:.2f} °")
+
+print("Rotated blade stagger angles (arctan2):")
+print(f"    hub: {rotated_stagger_angle_hub_arctan2:.2f} °")
+print(f"    mid: {rotated_stagger_angle_mid_arctan2:.2f} °")
+print(f"    tip: {rotated_stagger_angle_tip_arctan2:.2f} °")
 
 # 2D plotting
 plt.figure(figsize=(16, 4))
@@ -354,8 +357,8 @@ plt.plot(m_tip, theta_tip, label="Tip")
 plt.xticks(percentage_positions)
 # plt.xlim(0, 1)
 # plt.ylim(0,)
-plt.xlabel(r"$\%m_{prime}$")
-plt.ylabel(r"$\theta$")
+plt.xlabel(r"$m'\; (-)$")
+plt.ylabel(r"$\theta\; (^\circ)$")
 plt.grid(True)
 plt.legend()
 plt.show()

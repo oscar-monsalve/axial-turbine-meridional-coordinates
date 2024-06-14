@@ -136,6 +136,11 @@ def interpolate_polynomial(m_prime_percentage: float, theta: float, points_to_ev
 
     return interpolated_values_points, r_squared
 
+
+def cord_length(x1: float, x2: float, y1: float, y2: float) -> float:
+    """Returns the profile's cord length from the 2D coordinates of the leading and trailing edge"""
+    return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
 # ----------------------------------------------------------------------------------------------
 
 
@@ -201,6 +206,10 @@ interpolated_values_hub, r_squared_hub = interpolate_polynomial(m_hub, theta_hub
 interpolated_values_mid, r_squared_mid = interpolate_polynomial(m_mid, theta_mid, percentage_positions)
 interpolated_values_tip, r_squared_tip = interpolate_polynomial(m_tip, theta_tip, percentage_positions)
 
+# Calculate the profile's cord legnth
+cord_length_hub_original = cord_length(x_hub_2d[0], x_hub_2d[-1], y_hub_2d[0], y_hub_2d[-1])
+cord_length_mid_original = cord_length(x_mid_2d[0], x_mid_2d[-1], y_mid_2d[0], y_mid_2d[-1])
+cord_length_tip_original = cord_length(x_tip_2d[0], x_tip_2d[-1], y_tip_2d[0], y_tip_2d[-1])
 
 # Print 2D coordinates
 # print("2D x-coordinate")
@@ -250,10 +259,15 @@ for i, pos in enumerate(percentage_positions):
     print(f"theta_tip = {interpolated_values_tip[i]:.4f} ")
     print("---------------------------------")
 
+print("Original profile cord lengths:")
+print(f"    hub -> {cord_length_hub_original:.5f} m")
+print(f"    mid -> {cord_length_mid_original:.5f} m")
+print(f"    tip -> {cord_length_tip_original:.5f} m")
+
 print("Stagger angles:")
-print(f"hub -> {beta_avg_hub:.2f}°")
-print(f"mid -> {beta_avg_mid:.2f}°")
-print(f"tip -> {beta_avg_tip:.2f}°")
+print(f"    hub -> {beta_avg_hub:.2f}°")
+print(f"    mid -> {beta_avg_mid:.2f}°")
+print(f"    tip -> {beta_avg_tip:.2f}°")
 
 # 2D plotting of unrotated profile
 plt.figure(figsize=(16, 4))
