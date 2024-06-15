@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import math_model
 
-if __name__ == "__main__":
 
+def main() -> None:
     """
     User inputs:
         H: head (m)
@@ -222,3 +222,7 @@ if __name__ == "__main__":
     # np.savetxt("theta_hub.txt", theta_hub, delimiter=",")
     # np.savetxt("theta_mid.txt", theta_mid, delimiter=",")
     # np.savetxt("theta_tip.txt", theta_tip, delimiter=",")
+
+
+if __name__ == "__main__":
+    main()
